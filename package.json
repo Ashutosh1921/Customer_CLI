@@ -3,5 +3,17 @@
     "commander": "^12.1.0",
     "inquirer": "^12.2.0",
     "mongoose": "^8.8.4"
-  }
+  },
+  "name": "csdt",
+  "version": "1.0.0",
+  "main": "index.js",
+  "preferGlobal": true,
+  "bin": "./index.js",
+  "devDependencies": {},
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "",
+  "license": "ISC",
+  "description": ""
 }

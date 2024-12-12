@@ -1,3 +1,4 @@
+#!/usr/bin/env node
 const { Command } = require("commander");
 const { addCustomer, findCustomers, updateCustomer, deleteCustomer, AllCustomer } = require("./customer_cli/app");
 const program = new Command();
