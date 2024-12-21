@@ -1,0 +1,21 @@
+{
+  "name": "csdt",
+  "version": "1.0.0",
+  "main": "app.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "chalk": "^5.4.0",
+    "commander": "^12.1.0",
+    "inquirer": "^8.2.6",
+    "ioredis": "^5.4.1",
+    "mongoose": "^8.9.2",
+    "shortid": "^2.2.16",
+    "yargs": "^17.7.2"
+  },
+  "description": "",
+  "type": "module"
+}
