@@ -8,10 +8,10 @@ export const connectDB = async () => {
   try {
     await mongoose.connect("mongodb://localhost:27017/CustomerCLI");
     console.log(chalk.green("✔ MongoDB connected successfully"));
-    
+
     // Clear cache on startup to ensure fresh state
     await clearCache();
-    
+
     // Initial resequence to ensure all IDs are correct
     const count = await Customer.countDocuments();
     if (count > 0) {
@@ -26,23 +26,25 @@ export const connectDB = async () => {
 export const addCustomer = async (customer) => {
   try {
     const newCustomer = await Customer.create(customer);
-    
+
     // Invalidate relevant caches
     await clearCache();
-    
+
     console.log(chalk.green("\n✔ Customer added successfully:"));
     console.table(newCustomer.toDisplay());
     return newCustomer;
+
   } catch (error) {
     throw new Error(`Failed to add customer: ${error.message}`);
   }
 };
 
+
 export const findCustomers = async (name) => {
   try {
     const cacheKey = `search:${name.toLowerCase()}`;
     const cachedResults = await getCache(cacheKey);
-    
+
     if (cachedResults) {
       console.log(chalk.blue('✓ Retrieved from cache'));
       return cachedResults;
@@ -55,13 +57,13 @@ export const findCustomers = async (name) => {
         { lastname: search }
       ]
     }).sort({ customerId: 1 });
-    
+
     const results = customers.length > 0 ? customers.map(customer => customer.toDisplay()) : [];
-    
+
     // Cache results for 1 hour
     await setCacheWithExpiry(cacheKey, results, 3600);
     console.log(chalk.blue('✓ Cached search results'));
-    
+
     return results;
   } catch (error) {
     throw new Error(`Failed to find customers: ${error.message}`);
@@ -77,10 +79,10 @@ export const updateCustomer = async (customerId, updates) => {
 
     Object.assign(customer, updates);
     await customer.save();
-    
+
     // Invalidate relevant caches
     await clearCache();
-    
+
     console.log(chalk.green("\n✔ Customer updated successfully:"));
     console.table(customer.toDisplay());
     return customer;
@@ -106,15 +108,15 @@ export const deleteCustomer = async (param) => {
 
     console.log(chalk.yellow("\nDeleting customer:"));
     console.table(customer.toDisplay());
-    
+
     await Customer.deleteOne({ _id: customer._id });
-    
+
     // Resequence all IDs after deletion
     await Customer.resequenceIds();
-    
+
     // Invalidate all caches
     await clearCache();
-    
+
     return true;
   } catch (error) {
     throw new Error(`Failed to delete customer: ${error.message}`);
@@ -125,7 +127,7 @@ export const getAllCustomers = async () => {
   try {
     const cacheKey = 'all_customers';
     const cachedCustomers = await getCache(cacheKey);
-    
+
     if (cachedCustomers) {
       console.log(chalk.blue('✓ Retrieved from cache'));
       return cachedCustomers;
@@ -133,14 +135,14 @@ export const getAllCustomers = async () => {
 
     const customers = await Customer.find({})
       .sort({ customerId: 1 });
-    
-    const results = customers.length > 0 ? 
+
+    const results = customers.length > 0 ?
       customers.map(customer => customer.toDisplay()) : [];
-    
+
     // Cache results for 1 hour
     await setCacheWithExpiry(cacheKey, results, 3600);
     console.log(chalk.blue('✓ Cached customer list'));
-    
+
     return results;
   } catch (error) {
     throw new Error(`Failed to retrieve customers: ${error.message}`);

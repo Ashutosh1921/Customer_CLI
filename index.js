@@ -1,13 +1,14 @@
 // index.js
 import inquirer from 'inquirer';
 import chalk from 'chalk';
-import { 
-  connectDB, 
-  addCustomer, 
-  findCustomers, 
-  updateCustomer, 
-  deleteCustomer, 
-  getAllCustomers 
+
+import {
+  connectDB,
+  addCustomer,
+  findCustomers,
+  updateCustomer,
+  deleteCustomer,
+  getAllCustomers
 } from './customerOperations.js';
 
 await connectDB();
@@ -105,17 +106,39 @@ const updateCustomerDetailsQuestions = [
 const handleAddCustomer = async () => {
   try {
     const answers = await inquirer.prompt(addCustomerQuestions);
+    // waiting for customer to enter options.
     await addCustomer(answers);
+    // waiting for customer object to comesback after saving in db.
+
+    console.log(chalk.green('\n✔ Customer added successfully!\n'));
+    // here giving option to end program early on if did not wanted to add customers.
+    const { addMore } = await inquirer.prompt([
+      {
+        type: 'confirm',
+        name: 'addMore',
+        message: 'Do you want to add another customer?',
+        default: true
+      }
+    ]);
+
+    if (addMore) {
+      await handleAddCustomer(); // Recursively call the function to add another customer
+    } else {
+      console.log(chalk.blue.bold('\n👋 Goodbye!\n'));
+      process.exit(0); // Exit the program
+    }
   } catch (error) {
     console.error(chalk.red(`\n✘ ${error.message}\n`));
   }
 };
 
+
+
 const handleFindCustomers = async () => {
   try {
     const { name } = await inquirer.prompt(findCustomerQuestions);
     const customers = await findCustomers(name);
-    
+
     if (customers.length > 0) {
       console.log(chalk.green(`\n✔ Found ${customers.length} customers:`));
       console.table(customers);
@@ -131,7 +154,7 @@ const handleUpdateCustomer = async () => {
   try {
     const { id } = await inquirer.prompt(updateCustomerInitialQuestions);
     const { field, value } = await inquirer.prompt(updateCustomerDetailsQuestions);
-    
+
     const fieldMap = {
       'First Name': 'firstname',
       'Last Name': 'lastname',
@@ -171,11 +194,11 @@ const handleListCustomers = async () => {
 
 const main = async () => {
   console.log(chalk.blue.bold('\n🎯 Welcome to Customer Management CLI!\n'));
-  
+
   while (true) {
     try {
       const { action } = await inquirer.prompt(mainMenu);
-      
+
       switch (action) {
         case 'Add Customer':
           await handleAddCustomer();
